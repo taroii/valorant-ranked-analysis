@@ -160,15 +160,6 @@ def scrape(username, tag, region, driver):
     show_more_click = wait_and_click_show_more(driver)
     if not show_more_click:
         return None  # "Show More" button did not load 
-    # try:
-    #     show_more_button = WebDriverWait(driver, 10).until(
-    #         EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "Show More")]'))
-    #     )
-    #     actions = ActionChains(driver)
-    #     actions.move_to_element(show_more_button).pause(random.uniform(0.3, 0.8)).click().perform()
-    #     # log.info("Clicked Show More!")
-    # except Exception as e:
-    #     log.error("Couldn't find or click the Show More button:", e)
 
     # Collect stats
     try:
@@ -215,71 +206,6 @@ def scrape(username, tag, region, driver):
                     log.warning(f"Skipping stat in {category}: {e}")
     except Exception as e:
         log.warning(f"Failed to parse drawer stats: {e}")
-
-    # try:
-    #     # Wait for the drawer to appear
-    #     WebDriverWait(driver, 10).until(
-    #         EC.presence_of_element_located((By.CLASS_NAME, "drawer__content-stats"))
-    #     )
-
-    #     # Find the container that holds all stat sections
-    #     drawer_stats_container = driver.find_element(By.CLASS_NAME, "drawer__content-stats")
-
-    #     # Get all stat sections inside the drawer
-    #     stat_sections = drawer_stats_container.find_elements(By.XPATH, './/div[contains(@class, "bg-surface-1")]')
-
-    #     for section in stat_sections:
-    #         # Try to extract the category label
-    #         try:
-    #             title_div = section.find_element(By.XPATH, './/div[contains(@class, "font-medium") and contains(@class, "text-20")]')
-    #             category = title_div.text.strip()
-    #         except:
-    #             category = "Uncategorized"
-
-    #         # Get each stat block inside the section
-    #         stat_blocks = section.find_elements(By.XPATH, './/div[contains(@class, "stat flex")]')
-
-    #         for block in stat_blocks:
-    #             try:
-    #                 label = block.find_element(By.CLASS_NAME, "font-normal").text.strip()
-    #                 value = block.find_element(By.CLASS_NAME, "font-medium").text.strip()
-
-    #                 label_clean = clean_label(label)
-    #                 full_label = f"{category}_{label_clean}"
-    #                 stats[full_label] = value
-    #             except Exception as e:
-    #                 log.warning(f"Skipping stat in {category}: {e}")
-
-    # except Exception as e:
-    #     log.warning(f"Failed to locate or parse drawer stats: {e}")
-    
-    # # Find all stat sections (Combat, Game, Attack, Defense, Uncategorized)
-    # stat_sections = driver.find_elements(By.XPATH, '//div[contains(@class, "bg-surface-1 flex flex-col gap-px")]')
-
-    # # Collect data from each stat section
-    # for section in stat_sections:
-    #     try:
-    #         # Get section title
-    #         category = section.find_element(By.XPATH, './/div[contains(@class, "font-medium text-20")]').text.strip()
-    #     except:
-    #         category = "Uncategorized"
-
-    #     stat_blocks = section.find_elements(By.XPATH, './/div[contains(@class, "stat flex")]')
-
-    #     for block in stat_blocks:
-    #         try:
-    #             label = block.find_element(By.CLASS_NAME, "font-normal").text.strip()
-    #             value = block.find_element(By.CLASS_NAME, "font-medium").text.strip()
-    #             # Prefix the stat label with the category
-    #             label_clean = clean_label(label)
-    #             full_label = f"{category}_{label_clean}"
-    #             stats[full_label] = value
-    #         except Exception as e:
-    #             log.warning(f"Skipping stat in {category}: {e}")
-
-    # if not stats or len(stats) <= 2:  # Only has IGN and region
-    #     log.warning(f"Failed to scrape: {username}#{tag}")
-    #     return None
     
     return stats
 
@@ -315,21 +241,6 @@ if __name__ == "__main__":
             pd.DataFrame(results).to_csv(args.output_csv, index=False)
             log.info(f"Batch {i+1} saved. Cooling down for {cooldown_minutes} minutes.")
             time.sleep(cooldown_minutes * 60)
-
-
-    # for i, row in tqdm(player_df.iterrows(), total=len(player_df)):
-    #     if i % 10 == 0:
-    #         time.sleep(random.uniform(20, 30))
-    #     max_retries = 2
-    #     for attempt in range(max_retries):
-    #         try:
-    #             player_stats = scrape(row["username"], row["tag"], row["region"], driver)
-    #             if player_stats:
-    #                 results.append(player_stats)
-    #             break
-    #         except Exception as e:
-    #             print(f"Retrying {row['username']}#{row['tag']} (attempt {attempt+1}) due to error: {e}")
-    #             time.sleep(random.uniform(2, 4))
 
     final_df = pd.DataFrame(results)
     final_df.to_csv(args.output_csv, index=False)
